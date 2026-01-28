@@ -19,13 +19,28 @@ This project implements a pet adoption platform where organizations (ORGs) can r
 
 ```
 src/
-├── core/                     # Shared building blocks (Entity, AggregateRoot, Either, etc.)
-└── domain/
-    └── adoption/
-        ├── enterprise/       # Domain layer (entities, value objects)
-        └── application/      # Application layer (use cases, repositories)
+├── @types/                   # TypeScript type declarations
+├── core/                     # Shared building blocks
+│   ├── entities/             # Entity, AggregateRoot, UniqueEntityId
+│   ├── errors/               # Common domain errors
+│   ├── events/               # Domain events infrastructure
+│   └── types/                # Utility types (Optional, Either)
+├── domain/
+│   └── adoption/
+│       ├── enterprise/       # Domain layer (entities, value objects)
+│       └── application/      # Application layer (use cases, repositories, cryptography interfaces)
+└── infra/                    # Infrastructure layer
+    ├── cryptography/         # JWT and bcrypt implementations
+    ├── database/
+    │   └── prisma/           # Prisma client, mappers, and repositories
+    ├── env/                  # Environment configuration
+    └── http/                 # HTTP layer (Fastify)
+        ├── controllers/      # Route handlers
+        ├── middlewares/      # Auth middleware (JWT verification)
+        └── presenters/       # Response formatters
 
 test/
+├── cryptography/             # Cryptography test doubles
 ├── factories/                # Test data factories
 └── repositories/             # In-memory repository implementations
 ```
@@ -33,8 +48,15 @@ test/
 ## Tech Stack
 
 - TypeScript
+- Fastify (HTTP framework)
+- Prisma (ORM)
+- PostgreSQL
+- Zod (validation)
+- JWT (authentication)
+- bcryptjs (password hashing)
 - Vitest (testing)
-- ESLint
+- Docker
+- ESLint + Husky (code quality)
 
 ## Running Tests
 
