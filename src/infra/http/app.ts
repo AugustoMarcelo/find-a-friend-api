@@ -3,12 +3,9 @@ import fastifyJwt from '@fastify/jwt'
 import fastifyCookie from '@fastify/cookie'
 import fastifySwagger from '@fastify/swagger'
 import scalar from '@scalar/fastify-api-reference'
-import { ZodError } from 'zod'
 import { env } from '../env'
 import { routes } from './routes'
-import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
-import { InvalidCredentialsError } from '@/core/errors/invalid-credentials-error'
-import { OrganizationAlreadyExistsError } from '@/domain/adoption/application/use-cases/errors/organization-already-exists-error'
+import { ErrorMapper } from './errors'
 
 export const app = fastify()
 
@@ -56,56 +53,10 @@ app.register(fastifyCookie)
 app.register(routes)
 
 app.setErrorHandler((error, request, reply) => {
-  if (error instanceof ZodError) {
-    return reply.status(400).send({
-      message: 'Validation error',
-      issues: error.issues,
-    })
-  }
+  const mappedError = ErrorMapper.toHttp(error)
 
-  if (error instanceof ResourceNotFoundError) {
-    return reply.status(404).send({
-      message: error.message,
-    })
-  }
-
-  if (error instanceof InvalidCredentialsError) {
-    return reply.status(401).send({
-      message: error.message,
-    })
-  }
-
-  if (error instanceof OrganizationAlreadyExistsError) {
-    return reply.status(409).send({
-      message: error.message,
-    })
-  }
-
-  // Handle Fastify validation errors
-  if (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    error.code === 'FST_ERR_VALIDATION' &&
-    'validation' in error
-  ) {
-    return reply.status(400).send({
-      message: 'Validation error',
-      issues: error.validation,
-    })
-  }
-
-  // Handle JWT errors
-  if (typeof error === 'object' && error !== null && 'code' in error) {
-    const errorCode = error.code
-    if (
-      errorCode === 'FST_JWT_NO_AUTHORIZATION_IN_COOKIE' ||
-      errorCode === 'FST_JWT_AUTHORIZATION_TOKEN_INVALID'
-    ) {
-      return reply.status(401).send({
-        message: 'Unauthorized',
-      })
-    }
+  if (mappedError) {
+    return reply.status(mappedError.statusCode).send(mappedError.body)
   }
 
   if (env.NODE_ENV !== 'production') {

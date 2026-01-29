@@ -3,7 +3,6 @@ import { z } from 'zod'
 import { UploadPetPhotoUseCase } from '@/domain/adoption/application/use-cases/upload-pet-photo'
 import { PrismaPetsRepository } from '@/infra/database/prisma/repositories/prisma-pets-repository'
 import { PrismaPetPhotosRepository } from '@/infra/database/prisma/repositories/prisma-pet-photos-repository'
-import { NotAllowedError } from '@/core/errors/not-allowed-error'
 
 const uploadPetPhotoParamsSchema = z.object({
   petId: z.uuid(),
@@ -32,13 +31,7 @@ export async function uploadPhotoController(
   })
 
   if (result.isLeft()) {
-    const error = result.value
-
-    if (error instanceof NotAllowedError) {
-      return reply.status(403).send({ message: error.message })
-    }
-
-    throw error
+    throw result.value
   }
 
   const { photo } = result.value

@@ -3,7 +3,6 @@ import { z } from 'zod'
 import { DeletePetPhotoUseCase } from '@/domain/adoption/application/use-cases/delete-pet-photo'
 import { PrismaPetsRepository } from '@/infra/database/prisma/repositories/prisma-pets-repository'
 import { PrismaPetPhotosRepository } from '@/infra/database/prisma/repositories/prisma-pet-photos-repository'
-import { NotAllowedError } from '@/core/errors/not-allowed-error'
 
 const deletePetPhotoParamsSchema = z.object({
   petId: z.string().uuid(),
@@ -28,13 +27,7 @@ export async function deletePhotoController(
   })
 
   if (result.isLeft()) {
-    const error = result.value
-
-    if (error instanceof NotAllowedError) {
-      return reply.status(403).send({ message: error.message })
-    }
-
-    throw error
+    throw result.value
   }
 
   return reply.status(204).send()
