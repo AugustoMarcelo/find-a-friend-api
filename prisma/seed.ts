@@ -1,9 +1,9 @@
 import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
-import pg from 'pg'
+import { Pool } from 'pg'
 import { hash } from 'bcryptjs'
 
-const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL })
+const pool = new Pool({ connectionString: process.env.DATABASE_URL })
 const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
 
@@ -61,9 +61,13 @@ async function main() {
       energyLevel: 'HIGH',
       independenceLevel: 'LOW',
       environment: 'LARGE_SPACE',
-      photos: [
-        'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800',
-      ],
+      photos: {
+        create: [
+          {
+            url: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800',
+          },
+        ],
+      },
       adoptionRequirements: [
         'Precisa de espaço amplo para correr',
         'Necessita de passeios diários',
@@ -87,9 +91,13 @@ async function main() {
       energyLevel: 'LOW',
       independenceLevel: 'HIGH',
       environment: 'SMALL_SPACE',
-      photos: [
-        'https://images.unsplash.com/photo-1574158622682-e40e69881006?w=800',
-      ],
+      photos: {
+        create: [
+          {
+            url: 'https://images.unsplash.com/photo-1574158622682-e40e69881006?w=800',
+          },
+        ],
+      },
       adoptionRequirements: [
         'Ambiente calmo e tranquilo',
         'Pode ficar sozinha durante o dia',
@@ -112,9 +120,13 @@ async function main() {
       energyLevel: 'LOW',
       independenceLevel: 'MEDIUM',
       environment: 'MEDIUM_SPACE',
-      photos: [
-        'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=800',
-      ],
+      photos: {
+        create: [
+          {
+            url: 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=800',
+          },
+        ],
+      },
       adoptionRequirements: [
         'Ambiente tranquilo',
         'Ideal para pessoas mais calmas',
@@ -139,9 +151,13 @@ async function main() {
       energyLevel: 'HIGH',
       independenceLevel: 'LOW',
       environment: 'MEDIUM_SPACE',
-      photos: [
-        'https://images.unsplash.com/photo-1596492784531-6e6eb5ea9993?w=800',
-      ],
+      photos: {
+        create: [
+          {
+            url: 'https://images.unsplash.com/photo-1596492784531-6e6eb5ea9993?w=800',
+          },
+        ],
+      },
       adoptionRequirements: [
         'Precisa de atenção constante',
         'Necessita de adestramento básico',
@@ -165,9 +181,13 @@ async function main() {
       energyLevel: 'MEDIUM',
       independenceLevel: 'HIGH',
       environment: 'SMALL_SPACE',
-      photos: [
-        'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=800',
-      ],
+      photos: {
+        create: [
+          {
+            url: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=800',
+          },
+        ],
+      },
       adoptionRequirements: [
         'Telas nas janelas obrigatório',
         'Pode conviver com outros gatos',
@@ -190,9 +210,13 @@ async function main() {
       energyLevel: 'MEDIUM',
       independenceLevel: 'MEDIUM',
       environment: 'LARGE_SPACE',
-      photos: [
-        'https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=800',
-      ],
+      photos: {
+        create: [
+          {
+            url: 'https://images.unsplash.com/photo-1561037404-61cd46aa615b?w=800',
+          },
+        ],
+      },
       adoptionRequirements: [
         'Casa com quintal',
         'Não indicado para apartamentos',
