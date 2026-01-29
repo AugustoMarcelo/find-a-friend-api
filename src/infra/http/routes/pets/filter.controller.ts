@@ -2,7 +2,7 @@ import { FastifyRequest, FastifyReply } from 'fastify'
 import { z } from 'zod'
 import { FilterPetsUseCase } from '@/domain/adoption/application/use-cases/filter-pets'
 import { PrismaPetsRepository } from '@/infra/database/prisma/repositories/prisma-pets-repository'
-import { PetPresenter } from '../presenters/pet-presenter'
+import { PetPresenter } from '../../presenters/pet-presenter'
 
 const filterPetsQuerySchema = z.object({
   city: z.string().min(2),
@@ -15,7 +15,7 @@ const filterPetsQuerySchema = z.object({
     .optional(),
 })
 
-export async function filterPetsController(
+export async function filterController(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {

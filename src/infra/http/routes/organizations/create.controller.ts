@@ -4,7 +4,7 @@ import { CreateOrganizationUseCase } from '@/domain/adoption/application/use-cas
 import { PrismaOrganizationsRepository } from '@/infra/database/prisma/repositories/prisma-organizations-repository'
 import { BcryptHasher } from '@/infra/cryptography/bcrypt-hasher'
 import { OrganizationAlreadyExistsError } from '@/domain/adoption/application/use-cases/errors/organization-already-exists-error'
-import { OrganizationPresenter } from '../presenters/organization-presenter'
+import { OrganizationPresenter } from '../../presenters/organization-presenter'
 
 const createOrganizationBodySchema = z.object({
   ownerName: z.string().min(2),
@@ -17,7 +17,7 @@ const createOrganizationBodySchema = z.object({
   password: z.string().min(6),
 })
 
-export async function createOrganizationController(
+export async function createController(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {

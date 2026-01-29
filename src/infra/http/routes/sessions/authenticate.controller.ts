@@ -11,7 +11,7 @@ const authenticateBodySchema = z.object({
   password: z.string(),
 })
 
-export async function authenticateOrganizationController(
+export async function authenticateController(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {

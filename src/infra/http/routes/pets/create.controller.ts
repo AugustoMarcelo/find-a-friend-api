@@ -5,7 +5,7 @@ import { PrismaPetsRepository } from '@/infra/database/prisma/repositories/prism
 import { PrismaOrganizationsRepository } from '@/infra/database/prisma/repositories/prisma-organizations-repository'
 import { PrismaPetPhotosRepository } from '@/infra/database/prisma/repositories/prisma-pet-photos-repository'
 import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
-import { PetPresenter } from '../presenters/pet-presenter'
+import { PetPresenter } from '../../presenters/pet-presenter'
 
 const createPetBodySchema = z.object({
   name: z.string().min(2),
@@ -19,7 +19,7 @@ const createPetBodySchema = z.object({
   adoptionRequirements: z.array(z.string()).optional(),
 })
 
-export async function createPetController(
+export async function createController(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {

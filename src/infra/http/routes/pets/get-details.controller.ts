@@ -3,13 +3,13 @@ import { z } from 'zod'
 import { GetPetDetailsUseCase } from '@/domain/adoption/application/use-cases/get-pet-details'
 import { PrismaPetsRepository } from '@/infra/database/prisma/repositories/prisma-pets-repository'
 import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
-import { PetPresenter } from '../presenters/pet-presenter'
+import { PetPresenter } from '../../presenters/pet-presenter'
 
 const getPetDetailsParamsSchema = z.object({
   petId: z.string().uuid(),
 })
 
-export async function getPetDetailsController(
+export async function getDetailsController(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
