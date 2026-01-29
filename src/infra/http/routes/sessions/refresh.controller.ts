@@ -1,7 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { env } from '@/infra/env'
 
-export async function refreshTokenController(
+export async function refreshController(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {

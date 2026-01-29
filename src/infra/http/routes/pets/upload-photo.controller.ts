@@ -13,7 +13,7 @@ const uploadPetPhotoBodySchema = z.object({
   url: z.url(),
 })
 
-export async function uploadPetPhotoController(
+export async function uploadPhotoController(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {

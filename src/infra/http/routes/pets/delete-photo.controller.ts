@@ -10,7 +10,7 @@ const deletePetPhotoParamsSchema = z.object({
   photoId: z.string().uuid(),
 })
 
-export async function deletePetPhotoController(
+export async function deletePhotoController(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
