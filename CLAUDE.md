@@ -102,7 +102,7 @@ Copy `.env.example` to `.env`. Required vars: `DATABASE_URL`, `JWT_SECRET`. Conf
 ## Workflow
 
 For each new task:
-1. Create a new branch from `main`
+1. Create a new branch from `main` (ensure the branch is up to dated)
 2. Implement the code
 3. Commit the changes
 4. Create a pull request (user will approve manually)
