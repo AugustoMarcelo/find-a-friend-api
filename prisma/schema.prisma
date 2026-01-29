@@ -65,15 +65,27 @@ model Pet {
   energyLevel          EnergyLevel       @map("energy_level")
   independenceLevel    IndependenceLevel @map("independence_level")
   environment          Environment
-  photos               String[]
   adoptionRequirements String[]          @map("adoption_requirements")
   city                 String
   createdAt            DateTime          @default(now()) @map("created_at")
   updatedAt            DateTime?         @map("updated_at")
 
   organization Organization @relation(fields: [organizationId], references: [id])
+  photos       Photo[]
 
   @@index([city])
   @@index([organizationId])
   @@map("pets")
+}
+
+model Photo {
+  id        String   @id @default(uuid())
+  petId     String   @map("pet_id")
+  url       String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  pet Pet @relation(fields: [petId], references: [id], onDelete: Cascade)
+
+  @@index([petId])
+  @@map("photos")
 }

@@ -12,7 +12,11 @@ export class PetPresenter {
       energyLevel: pet.energyLevel.getValue(),
       independenceLevel: pet.independenceLevel.getValue(),
       environment: pet.environment.getValue(),
-      photos: pet.photos,
+      photos: pet.photos.getItems().map((photo) => ({
+        id: photo.id.toValue(),
+        url: photo.url,
+        createdAt: photo.createdAt,
+      })),
       adoptionRequirements: pet.adoptionRequirements,
       city: pet.city,
       createdAt: pet.createdAt,

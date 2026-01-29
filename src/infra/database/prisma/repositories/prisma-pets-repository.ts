@@ -5,16 +5,25 @@ import {
 } from '@/domain/adoption/application/repositories/pets-repository'
 import { Pet } from '@/domain/adoption/enterprise/entities/pet'
 import { PrismaPetMapper } from '../mappers/prisma-pet-mapper'
+import { PetPhotosRepository } from '@/domain/adoption/application/repositories/pet-photos-repository'
 
 export class PrismaPetsRepository implements PetsRepository {
+  constructor(private petPhotosRepository?: PetPhotosRepository) {}
+
   async create(pet: Pet): Promise<void> {
     const data = PrismaPetMapper.toPrisma(pet)
+
     await prisma.pet.create({ data })
+
+    if (this.petPhotosRepository) {
+      await this.petPhotosRepository.createMany(pet.photos.getItems())
+    }
   }
 
   async findById(id: string): Promise<Pet | null> {
     const pet = await prisma.pet.findUnique({
       where: { id },
+      include: { photos: true },
     })
 
     if (!pet) {
@@ -32,6 +41,7 @@ export class PrismaPetsRepository implements PetsRepository {
           mode: 'insensitive',
         },
       },
+      include: { photos: true },
     })
 
     return pets.map(PrismaPetMapper.toDomain)
@@ -56,6 +66,7 @@ export class PrismaPetsRepository implements PetsRepository {
           environment: filters.environment.getValue(),
         }),
       },
+      include: { photos: true },
     })
 
     return pets.map(PrismaPetMapper.toDomain)
@@ -64,6 +75,7 @@ export class PrismaPetsRepository implements PetsRepository {
   async findManyByOrganizationId(organizationId: string): Promise<Pet[]> {
     const pets = await prisma.pet.findMany({
       where: { organizationId },
+      include: { photos: true },
     })
 
     return pets.map(PrismaPetMapper.toDomain)
@@ -71,10 +83,16 @@ export class PrismaPetsRepository implements PetsRepository {
 
   async save(pet: Pet): Promise<void> {
     const data = PrismaPetMapper.toPrisma(pet)
+
     await prisma.pet.update({
       where: { id: data.id },
       data,
     })
+
+    if (this.petPhotosRepository) {
+      await this.petPhotosRepository.createMany(pet.photos.getNewItems())
+      await this.petPhotosRepository.deleteMany(pet.photos.getRemovedItems())
+    }
   }
 
   async delete(pet: Pet): Promise<void> {

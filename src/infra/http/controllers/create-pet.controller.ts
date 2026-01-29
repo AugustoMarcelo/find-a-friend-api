@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { CreatePetUseCase } from '@/domain/adoption/application/use-cases/create-pet'
 import { PrismaPetsRepository } from '@/infra/database/prisma/repositories/prisma-pets-repository'
 import { PrismaOrganizationsRepository } from '@/infra/database/prisma/repositories/prisma-organizations-repository'
+import { PrismaPetPhotosRepository } from '@/infra/database/prisma/repositories/prisma-pet-photos-repository'
 import { ResourceNotFoundError } from '@/core/errors/resource-not-found-error'
 import { PetPresenter } from '../presenters/pet-presenter'
 
@@ -25,7 +26,8 @@ export async function createPetController(
   const body = createPetBodySchema.parse(request.body)
   const organizationId = request.user.sub
 
-  const petsRepository = new PrismaPetsRepository()
+  const petPhotosRepository = new PrismaPetPhotosRepository()
+  const petsRepository = new PrismaPetsRepository(petPhotosRepository)
   const organizationsRepository = new PrismaOrganizationsRepository()
   const useCase = new CreatePetUseCase(petsRepository, organizationsRepository)
 

@@ -1,4 +1,4 @@
-import { Entity } from '@/core/entities/entity'
+import { AggregateRoot } from '@/core/entities/aggregate-root'
 import { UniqueEntityId } from '@/core/entities/unique-entity-id'
 import { Optional } from '@/core/types/optional'
 import { PetAge } from './value-objects/pet-age'
@@ -6,6 +6,8 @@ import { PetSize } from './value-objects/pet-size'
 import { EnergyLevel } from './value-objects/energy-level'
 import { IndependenceLevel } from './value-objects/independence-level'
 import { Environment } from './value-objects/environment'
+import { PetPhotos } from './pet-photos'
+import { Photo } from './photo'
 
 export interface PetProps {
   organizationId: UniqueEntityId
@@ -16,14 +18,14 @@ export interface PetProps {
   energyLevel: EnergyLevel
   independenceLevel: IndependenceLevel
   environment: Environment
-  photos: string[]
+  photos: PetPhotos
   adoptionRequirements: string[]
   city: string
   createdAt: Date
   updatedAt?: Date | null
 }
 
-export class Pet extends Entity<PetProps> {
+export class Pet extends AggregateRoot<PetProps> {
   get organizationId(): UniqueEntityId {
     return this.props.organizationId
   }
@@ -56,7 +58,7 @@ export class Pet extends Entity<PetProps> {
     return this.props.environment
   }
 
-  get photos(): string[] {
+  get photos(): PetPhotos {
     return this.props.photos
   }
 
@@ -93,13 +95,13 @@ export class Pet extends Entity<PetProps> {
     this.touch()
   }
 
-  addPhoto(photoUrl: string): void {
-    this.props.photos.push(photoUrl)
+  addPhoto(photo: Photo): void {
+    this.props.photos.add(photo)
     this.touch()
   }
 
-  removePhoto(photoUrl: string): void {
-    this.props.photos = this.props.photos.filter((p) => p !== photoUrl)
+  removePhoto(photo: Photo): void {
+    this.props.photos.remove(photo)
     this.touch()
   }
 
@@ -112,6 +114,11 @@ export class Pet extends Entity<PetProps> {
     this.props.adoptionRequirements = this.props.adoptionRequirements.filter(
       (r) => r !== requirement,
     )
+    this.touch()
+  }
+
+  set photos(photos: PetPhotos) {
+    this.props.photos = photos
     this.touch()
   }
 
@@ -129,7 +136,7 @@ export class Pet extends Entity<PetProps> {
     return new Pet(
       {
         ...props,
-        photos: props.photos ?? [],
+        photos: props.photos ?? new PetPhotos(),
         adoptionRequirements: props.adoptionRequirements ?? [],
         createdAt: props.createdAt ?? new Date(),
         updatedAt: props.updatedAt ?? null,

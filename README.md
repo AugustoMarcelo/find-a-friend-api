@@ -12,6 +12,7 @@ This project implements a pet adoption platform where organizations (ORGs) can r
 - **City-based listing** - List pets available for adoption in a specific city
 - **Advanced filtering** - Filter pets by age, size, energy level, independence level, and environment
 - **Pet details** - View comprehensive information about a specific pet
+- **Pet photos** - Upload and manage photos for pets
 - **ORG registration** - Register organizations responsible for pets
 - **ORG authentication** - Secure login for organizations
 

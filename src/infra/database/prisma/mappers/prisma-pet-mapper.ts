@@ -1,4 +1,4 @@
-import { Pet as PrismaPet } from '@prisma/client'
+import { Pet as PrismaPet, Photo as PrismaPhoto } from '@prisma/client'
 import { Pet } from '@/domain/adoption/enterprise/entities/pet'
 import { UniqueEntityId } from '@/core/entities/unique-entity-id'
 import { PetAge } from '@/domain/adoption/enterprise/entities/value-objects/pet-age'
@@ -6,9 +6,26 @@ import { PetSize } from '@/domain/adoption/enterprise/entities/value-objects/pet
 import { EnergyLevel } from '@/domain/adoption/enterprise/entities/value-objects/energy-level'
 import { IndependenceLevel } from '@/domain/adoption/enterprise/entities/value-objects/independence-level'
 import { Environment } from '@/domain/adoption/enterprise/entities/value-objects/environment'
+import { PetPhotos } from '@/domain/adoption/enterprise/entities/pet-photos'
+import { Photo } from '@/domain/adoption/enterprise/entities/photo'
+
+type PrismaPetWithPhotos = PrismaPet & {
+  photos: PrismaPhoto[]
+}
 
 export class PrismaPetMapper {
-  static toDomain(raw: PrismaPet): Pet {
+  static toDomain(raw: PrismaPetWithPhotos): Pet {
+    const photos = raw.photos.map((photo) =>
+      Photo.create(
+        {
+          petId: new UniqueEntityId(photo.petId),
+          url: photo.url,
+          createdAt: photo.createdAt,
+        },
+        new UniqueEntityId(photo.id),
+      ),
+    )
+
     return Pet.create(
       {
         organizationId: new UniqueEntityId(raw.organizationId),
@@ -19,7 +36,7 @@ export class PrismaPetMapper {
         energyLevel: EnergyLevel.create(raw.energyLevel),
         independenceLevel: IndependenceLevel.create(raw.independenceLevel),
         environment: Environment.create(raw.environment),
-        photos: raw.photos,
+        photos: new PetPhotos(photos),
         adoptionRequirements: raw.adoptionRequirements,
         city: raw.city,
         createdAt: raw.createdAt,
@@ -40,7 +57,6 @@ export class PrismaPetMapper {
       energyLevel: pet.energyLevel.getValue(),
       independenceLevel: pet.independenceLevel.getValue(),
       environment: pet.environment.getValue(),
-      photos: pet.photos,
       adoptionRequirements: pet.adoptionRequirements,
       city: pet.city,
       createdAt: pet.createdAt,

@@ -71,7 +71,7 @@ describe('Create Pet', () => {
 
     expect(result.isRight()).toBe(true)
     if (result.isRight()) {
-      expect(result.value.pet.photos).toEqual([])
+      expect(result.value.pet.photos.getItems()).toEqual([])
       expect(result.value.pet.adoptionRequirements).toEqual([])
     }
   })

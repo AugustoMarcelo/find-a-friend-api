@@ -9,6 +9,8 @@ import { EnergyLevel } from '../../enterprise/entities/value-objects/energy-leve
 import { IndependenceLevel } from '../../enterprise/entities/value-objects/independence-level'
 import { Environment } from '../../enterprise/entities/value-objects/environment'
 import { UniqueEntityId } from '@/core/entities/unique-entity-id'
+import { Photo } from '../../enterprise/entities/photo'
+import { PetPhotos } from '../../enterprise/entities/pet-photos'
 
 interface CreatePetRequest {
   organizationId: string
@@ -40,19 +42,31 @@ export class CreatePetUseCase {
       return left(new ResourceNotFoundError('Organization not found'))
     }
 
-    const pet = Pet.create({
-      organizationId: new UniqueEntityId(request.organizationId),
-      name: request.name,
-      about: request.about,
-      age: PetAge.create(request.age),
-      size: PetSize.create(request.size),
-      energyLevel: EnergyLevel.create(request.energyLevel),
-      independenceLevel: IndependenceLevel.create(request.independenceLevel),
-      environment: Environment.create(request.environment),
-      photos: request.photos,
-      adoptionRequirements: request.adoptionRequirements,
-      city: organization.city,
-    })
+    const petId = new UniqueEntityId()
+
+    const photoEntities = (request.photos ?? []).map((url) =>
+      Photo.create({
+        petId,
+        url,
+      }),
+    )
+
+    const pet = Pet.create(
+      {
+        organizationId: new UniqueEntityId(request.organizationId),
+        name: request.name,
+        about: request.about,
+        age: PetAge.create(request.age),
+        size: PetSize.create(request.size),
+        energyLevel: EnergyLevel.create(request.energyLevel),
+        independenceLevel: IndependenceLevel.create(request.independenceLevel),
+        environment: Environment.create(request.environment),
+        photos: new PetPhotos(photoEntities),
+        adoptionRequirements: request.adoptionRequirements,
+        city: organization.city,
+      },
+      petId,
+    )
 
     await this.petsRepository.create(pet)
 

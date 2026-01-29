@@ -6,6 +6,8 @@ import { createPetController } from './controllers/create-pet.controller'
 import { getPetDetailsController } from './controllers/get-pet-details.controller'
 import { listPetsByCityController } from './controllers/list-pets-by-city.controller'
 import { filterPetsController } from './controllers/filter-pets.controller'
+import { uploadPetPhotoController } from './controllers/upload-pet-photo.controller'
+import { deletePetPhotoController } from './controllers/delete-pet-photo.controller'
 import { verifyJwt } from './middlewares/verify-jwt'
 
 export async function routes(app: FastifyInstance) {
@@ -301,7 +303,17 @@ export async function routes(app: FastifyInstance) {
                     type: 'string',
                     enum: ['SMALL_SPACE', 'MEDIUM_SPACE', 'LARGE_SPACE'],
                   },
-                  photos: { type: 'array', items: { type: 'string' } },
+                  photos: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        id: { type: 'string', format: 'uuid' },
+                        url: { type: 'string' },
+                        createdAt: { type: 'string', format: 'date-time' },
+                      },
+                    },
+                  },
                   adoptionRequirements: {
                     type: 'array',
                     items: { type: 'string' },
@@ -400,7 +412,17 @@ export async function routes(app: FastifyInstance) {
                     type: 'string',
                     enum: ['SMALL_SPACE', 'MEDIUM_SPACE', 'LARGE_SPACE'],
                   },
-                  photos: { type: 'array', items: { type: 'string' } },
+                  photos: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        id: { type: 'string', format: 'uuid' },
+                        url: { type: 'string' },
+                        createdAt: { type: 'string', format: 'date-time' },
+                      },
+                    },
+                  },
                   adoptionRequirements: {
                     type: 'array',
                     items: { type: 'string' },
@@ -434,5 +456,111 @@ export async function routes(app: FastifyInstance) {
       },
     },
     createPetController,
+  )
+
+  // Pet photo routes
+  app.post(
+    '/pets/:petId/photos',
+    {
+      onRequest: [verifyJwt],
+      schema: {
+        tags: ['Pets'],
+        summary: 'Upload a photo to a pet',
+        security: [{ bearerAuth: [] }],
+        params: {
+          type: 'object',
+          required: ['petId'],
+          properties: {
+            petId: { type: 'string', format: 'uuid' },
+          },
+        },
+        body: {
+          type: 'object',
+          required: ['url'],
+          properties: {
+            url: { type: 'string', format: 'uri' },
+          },
+        },
+        response: {
+          201: {
+            type: 'object',
+            properties: {
+              photo: {
+                type: 'object',
+                properties: {
+                  id: { type: 'string', format: 'uuid' },
+                  petId: { type: 'string', format: 'uuid' },
+                  url: { type: 'string' },
+                  createdAt: { type: 'string', format: 'date-time' },
+                },
+              },
+            },
+          },
+          401: {
+            type: 'object',
+            properties: {
+              message: { type: 'string' },
+            },
+          },
+          403: {
+            type: 'object',
+            properties: {
+              message: { type: 'string' },
+            },
+          },
+          404: {
+            type: 'object',
+            properties: {
+              message: { type: 'string' },
+            },
+          },
+        },
+      },
+    },
+    uploadPetPhotoController,
+  )
+
+  app.delete(
+    '/pets/:petId/photos/:photoId',
+    {
+      onRequest: [verifyJwt],
+      schema: {
+        tags: ['Pets'],
+        summary: 'Delete a photo from a pet',
+        security: [{ bearerAuth: [] }],
+        params: {
+          type: 'object',
+          required: ['petId', 'photoId'],
+          properties: {
+            petId: { type: 'string', format: 'uuid' },
+            photoId: { type: 'string', format: 'uuid' },
+          },
+        },
+        response: {
+          204: {
+            type: 'null',
+          },
+          401: {
+            type: 'object',
+            properties: {
+              message: { type: 'string' },
+            },
+          },
+          403: {
+            type: 'object',
+            properties: {
+              message: { type: 'string' },
+            },
+          },
+          404: {
+            type: 'object',
+            properties: {
+              message: { type: 'string' },
+            },
+          },
+        },
+      },
+    },
+    deletePetPhotoController,
   )
 }

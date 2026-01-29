@@ -3,12 +3,19 @@ import {
   PetFilters,
 } from '@/domain/adoption/application/repositories/pets-repository'
 import { Pet } from '@/domain/adoption/enterprise/entities/pet'
+import { InMemoryPetPhotosRepository } from './in-memory-pet-photos-repository'
 
 export class InMemoryPetsRepository implements PetsRepository {
   public items: Pet[] = []
 
+  constructor(private petPhotosRepository?: InMemoryPetPhotosRepository) {}
+
   async create(pet: Pet): Promise<void> {
     this.items.push(pet)
+
+    if (this.petPhotosRepository) {
+      await this.petPhotosRepository.createMany(pet.photos.getItems())
+    }
   }
 
   async findById(id: string): Promise<Pet | null> {
@@ -64,6 +71,11 @@ export class InMemoryPetsRepository implements PetsRepository {
     const index = this.items.findIndex((item) => item.id.equals(pet.id))
     if (index >= 0) {
       this.items[index] = pet
+
+      if (this.petPhotosRepository) {
+        await this.petPhotosRepository.createMany(pet.photos.getNewItems())
+        await this.petPhotosRepository.deleteMany(pet.photos.getRemovedItems())
+      }
     }
   }
 
