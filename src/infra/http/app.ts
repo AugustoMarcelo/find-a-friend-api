@@ -81,6 +81,33 @@ app.setErrorHandler((error, request, reply) => {
     })
   }
 
+  // Handle Fastify validation errors
+  if (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    error.code === 'FST_ERR_VALIDATION' &&
+    'validation' in error
+  ) {
+    return reply.status(400).send({
+      message: 'Validation error',
+      issues: error.validation,
+    })
+  }
+
+  // Handle JWT errors
+  if (typeof error === 'object' && error !== null && 'code' in error) {
+    const errorCode = error.code
+    if (
+      errorCode === 'FST_JWT_NO_AUTHORIZATION_IN_COOKIE' ||
+      errorCode === 'FST_JWT_AUTHORIZATION_TOKEN_INVALID'
+    ) {
+      return reply.status(401).send({
+        message: 'Unauthorized',
+      })
+    }
+  }
+
   if (env.NODE_ENV !== 'production') {
     console.error(error)
   }
