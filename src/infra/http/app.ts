@@ -50,13 +50,20 @@ app.register(fastifyJwt, {
 
 app.register(fastifyCookie)
 
+app.setValidatorCompiler(() => {
+  return () => true
+})
+
 app.register(routes)
 
 app.setErrorHandler((error, request, reply) => {
   const mappedError = ErrorMapper.toHttp(error)
 
   if (mappedError) {
-    return reply.status(mappedError.statusCode).send(mappedError.body)
+    return reply
+      .status(mappedError.statusCode)
+      .header('content-type', 'application/json; charset=utf-8')
+      .send(JSON.stringify(mappedError.body))
   }
 
   if (env.NODE_ENV !== 'production') {

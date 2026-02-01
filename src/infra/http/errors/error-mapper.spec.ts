@@ -15,6 +15,32 @@ describe('ErrorMapper', () => {
     expect(result?.body.message).toBe('Validation error')
   })
 
+  it('should include field errors in ZodError response', () => {
+    const error = new ZodError([
+      {
+        code: 'invalid_type',
+        expected: 'string',
+        path: ['email'],
+        message: 'Required',
+      },
+      {
+        code: 'too_small',
+        minimum: 6,
+        origin: 'string',
+        inclusive: true,
+        path: ['password'],
+        message: 'String must contain at least 6 character(s)',
+      },
+    ])
+    const result = ErrorMapper.toHttp(error)
+
+    expect(result?.statusCode).toBe(400)
+    expect(result?.body.issues).toEqual({
+      email: ['Required'],
+      password: ['String must contain at least 6 character(s)'],
+    })
+  })
+
   it('should map ResourceNotFoundError to 404', () => {
     const error = new ResourceNotFoundError('Pet not found')
     const result = ErrorMapper.toHttp(error)
@@ -63,20 +89,6 @@ describe('ErrorMapper', () => {
     expect(result?.body.message).toBe(
       'Organization with this email already exists',
     )
-  })
-
-  it('should map Fastify validation error to 400', () => {
-    const error = {
-      code: 'FST_ERR_VALIDATION',
-      validation: [{ field: 'email', message: 'Invalid email' }],
-    }
-    const result = ErrorMapper.toHttp(error)
-
-    expect(result?.statusCode).toBe(400)
-    expect(result?.body.message).toBe('Validation error')
-    expect(result?.body.issues).toEqual([
-      { field: 'email', message: 'Invalid email' },
-    ])
   })
 
   it('should map JWT no authorization error to 401', () => {

@@ -8,11 +8,20 @@ import { HttpErrorResponse } from './http-error-response'
 export class ErrorMapper {
   static toHttp(error: unknown): HttpErrorResponse | null {
     if (error instanceof ZodError) {
+      const fieldErrors: Record<string, string[]> = {}
+      for (const issue of error.issues) {
+        const field = issue.path.join('.')
+        if (!fieldErrors[field]) {
+          fieldErrors[field] = []
+        }
+        fieldErrors[field].push(issue.message)
+      }
+
       return {
         statusCode: 400,
         body: {
           message: 'Validation error',
-          issues: error.issues,
+          issues: fieldErrors,
         },
       }
     }
@@ -45,16 +54,6 @@ export class ErrorMapper {
       }
     }
 
-    if (ErrorMapper.isFastifyValidationError(error)) {
-      return {
-        statusCode: 400,
-        body: {
-          message: 'Validation error',
-          issues: (error as { validation: unknown[] }).validation,
-        },
-      }
-    }
-
     if (ErrorMapper.isJwtError(error)) {
       return {
         statusCode: 401,
@@ -63,16 +62,6 @@ export class ErrorMapper {
     }
 
     return null
-  }
-
-  private static isFastifyValidationError(error: unknown): boolean {
-    return (
-      typeof error === 'object' &&
-      error !== null &&
-      'code' in error &&
-      (error as { code: string }).code === 'FST_ERR_VALIDATION' &&
-      'validation' in error
-    )
   }
 
   private static isJwtError(error: unknown): boolean {
