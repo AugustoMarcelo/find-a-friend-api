@@ -5,7 +5,18 @@ export async function refreshController(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
-  await request.jwtVerify({ onlyCookie: true })
+  const refreshToken = request.cookies.refreshToken
+
+  if (!refreshToken) {
+    return reply.status(401).send({ message: 'Unauthorized' })
+  }
+
+  try {
+    const decoded = request.server.jwt.verify<{ sub: string }>(refreshToken)
+    request.user = { sub: decoded.sub }
+  } catch {
+    return reply.status(401).send({ message: 'Unauthorized' })
+  }
 
   const accessToken = await reply.jwtSign(
     {},
@@ -17,7 +28,7 @@ export async function refreshController(
     },
   )
 
-  const refreshToken = await reply.jwtSign(
+  const newRefreshToken = await reply.jwtSign(
     {},
     {
       sign: {
@@ -28,7 +39,7 @@ export async function refreshController(
   )
 
   return reply
-    .setCookie('refreshToken', refreshToken, {
+    .setCookie('refreshToken', newRefreshToken, {
       path: '/',
       secure: true,
       sameSite: true,
