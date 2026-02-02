@@ -140,13 +140,16 @@ async function main() {
     const state = faker.helpers.arrayElement(STATES)
     const city = faker.location.city()
 
+    const orgId = faker.string.uuid()
+    const orgEmail = faker.internet.email().toLowerCase()
+
     const org = await prisma.organization.upsert({
-      where: { email: `org${i + 1}@${faker.internet.domainName()}` },
+      where: { email: orgEmail },
       update: {},
       create: {
-        id: `seed-org-${i + 1}`,
+        id: orgId,
         ownerName: faker.person.fullName(),
-        email: faker.internet.email().toLowerCase(),
+        email: orgEmail,
         cep: generateCep(),
         address: `${faker.location.street()}, ${faker.number.int({ min: 1, max: 2000 })}`,
         city,
@@ -172,11 +175,13 @@ async function main() {
       const independenceLevel = faker.helpers.arrayElement(INDEPENDENCE_LEVELS)
       const environment = faker.helpers.arrayElement(ENVIRONMENTS)
 
+      const petId = faker.string.uuid()
+
       await prisma.pet.upsert({
-        where: { id: `seed-pet-${petCount}` },
+        where: { id: petId },
         update: {},
         create: {
-          id: `seed-pet-${petCount}`,
+          id: petId,
           organizationId: org.id,
           name,
           about: generatePetAbout(name, age, energyLevel),
