@@ -6,6 +6,7 @@ export default defineConfig({
     globals: true,
     root: './',
     include: ['**/*.e2e-spec.ts'],
+    globalSetup: ['./test/e2e/global-setup.ts'],
     setupFiles: ['./test/e2e/setup-e2e.ts'],
     pool: 'forks',
     poolOptions: {
@@ -13,6 +14,8 @@ export default defineConfig({
         singleFork: true,
       },
     },
+    hookTimeout: 30000,
+    testTimeout: 30000,
   },
   resolve: {
     alias: {
