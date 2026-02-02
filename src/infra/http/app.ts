@@ -41,10 +41,6 @@ app.register(scalar, {
 
 app.register(fastifyJwt, {
   secret: env.JWT_SECRET,
-  cookie: {
-    cookieName: 'refreshToken',
-    signed: false,
-  },
   sign: {
     expiresIn: env.JWT_EXPIRES_IN,
   },
